@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+set -eo pipefail
+
+BUILD_DIR=$1
+MEDIAINFO_VER="20.09"
+
+disp() {
+  echo "-----> $*"
+}
+
+indent() {
+  sed -u 's/^/       /'
+}
+
+disp "Unpacking mediainfo"
+cd $BUILD_DIR
+curl -fsSL "https://github.com/code-rgb/files/raw/main/mediainfo_${MEDIAINFO_VER}.tar.gz" | tar xzf - | indent
+
+disp "Creating PROFILE_PATH"
+PROFILE_PATH="$BUILD_DIR/.profile.d"
+mkdir -p $PROFILE_PATH
+
+disp "Exporting PATH"
+cat <<EOF >${PROFILE_PATH}/mediainfo.sh
+export PATH="\$HOME/vendor/mediainfo/bin:\$PATH"
+export LD_LIBRARY_PATH="\$HOME/vendor/mediainfo/lib/x86_64-linux-gnu:\$HOME/vendor/mediainfo/lib/i386-linux-gnu:\$HOME/vendor/mediainfo/lib:\$LD_LIBRARY_PATH"
+export LIBRARY_PATH="\$HOME/vendor/mediainfo/lib/x86_64-linux-gnu:\$HOME/vendor/mediainfo/lib/i386-linux-gnu:\$HOME/vendor/mediainfo/lib:\$LIBRARY_PATH"
+EOF
+
+disp "Mediainfo v${MEDIAINFO_VER} installed successfully."

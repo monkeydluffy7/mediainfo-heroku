@@ -1,0 +1,43 @@
+name: Creating mediainfo TAR
+
+on:
+  push:
+    branches: [master]
+    paths-ignore: "README.md"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+
+    steps:
+      - name: Clearing cache
+        continue-on-error: true
+        run: |
+          sudo rm -rf /var/cache/apt/archives/*.deb
+          sudo apt-get remove libmms0 -y
+
+      - name: Downloading required packages
+        continue-on-error: true
+        run: |
+          sudo apt-get update && sudo apt-get install --download-only -y libmms0 
+          mkdir -p tempx vendor
+          cp /var/cache/apt/archives/*deb tempx
+          wget -qq -P tempx "https://mediaarea.net/download/binary/mediainfo/20.09/mediainfo_20.09-1_amd64.xUbuntu_20.04.deb"
+          wget -qq -P tempx "https://mediaarea.net/download/binary/libmediainfo0/20.09/libmediainfo0v5_20.09-1_amd64.xUbuntu_20.04.deb"
+          wget -qq -P tempx "https://mediaarea.net/download/binary/libzen0/0.4.38/libzen0v5_0.4.38-1_amd64.xUbuntu_20.04.deb"
+
+      - name: Unpacking Debs
+        continue-on-error: true
+        run: |
+          for DEB in $(ls -1 tempx/*.deb); do
+            sudo dpkg -x $DEB vendor
+          done
+          sudo mv vendor/usr vendor/mediainfo
+
+      - name: Compressing Output
+        continue-on-error: true
+        run: |
+          tar -zcvf mediainfo_20.09.tar.gz vendor
+          curl --upload-file ./mediainfo_20.09.tar.gz https://transfer.sh/mediainfo_20.09.tar.gz
+          echo "    Done."
