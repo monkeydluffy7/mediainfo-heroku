@@ -14,18 +14,16 @@ jobs:
       - name: Clearing cache
         continue-on-error: true
         run: |
-          sudo rm -rf /var/cache/apt/archives/*.deb
-          sudo apt-get remove libmms0 -y
+          sudo rm -rf /var/cache/apt/archives/*.deb vendor tempx
+          sudo apt-get remove libmms0 mediainfo -y
 
       - name: Downloading required packages
         continue-on-error: true
         run: |
-          sudo apt-get update && sudo apt-get install --download-only -y libmms0 
+          wget -qq https://mediaarea.net/repo/deb/repo-mediaarea_1.0-16_all.deb && sudo dpkg -i repo-mediaarea_1.0-16_all.deb
+          sudo apt-get update && sudo apt-get install --download-only -y libmms0 mediainfo
           mkdir -p tempx vendor
-          cp /var/cache/apt/archives/*deb tempx
-          wget -qq -P tempx "https://mediaarea.net/download/binary/mediainfo/20.09/mediainfo_20.09-1_amd64.xUbuntu_20.04.deb"
-          wget -qq -P tempx "https://mediaarea.net/download/binary/libmediainfo0/20.09/libmediainfo0v5_20.09-1_amd64.xUbuntu_20.04.deb"
-          wget -qq -P tempx "https://mediaarea.net/download/binary/libzen0/0.4.38/libzen0v5_0.4.38-1_amd64.xUbuntu_20.04.deb"
+          sudo mv /var/cache/apt/archives/*deb tempx
 
       - name: Unpacking Debs
         continue-on-error: true
