@@ -15,13 +15,13 @@ jobs:
         continue-on-error: true
         run: |
           sudo rm -rf /var/cache/apt/archives/*.deb vendor tempx
-          sudo apt-get remove libmms0 mediainfo -y
+          sudo apt-get remove libmms0 mediainfo libzen0v5 -y
 
       - name: Downloading required packages
         continue-on-error: true
         run: |
           wget -qq https://mediaarea.net/repo/deb/repo-mediaarea_1.0-16_all.deb && sudo dpkg -i repo-mediaarea_1.0-16_all.deb
-          sudo apt-get update && sudo apt-get install --download-only -y libmms0 mediainfo
+          sudo apt-get update && sudo apt-get install --download-only -y libmms0 mediainfo libzen0v5
           mkdir -p tempx vendor
           sudo mv /var/cache/apt/archives/*deb tempx
 
